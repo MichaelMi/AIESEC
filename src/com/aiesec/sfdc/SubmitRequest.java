@@ -6,4 +6,8 @@ public class SubmitRequest {
 	public void SaveResult() {
 		
 	}
+	
+	public void SaveResultToSFDC() {
+		String emailString = "";
+	}
 }
