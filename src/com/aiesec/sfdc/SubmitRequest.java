@@ -4,7 +4,7 @@ public class SubmitRequest {
 	
 	
 	public void SaveResult() {
-		
+		String bString = "";
 	}
 	
 	public void SaveResultToSFDC() {
