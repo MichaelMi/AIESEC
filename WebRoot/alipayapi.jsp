@@ -31,7 +31,7 @@
 		////////////////////////////////////请求参数//////////////////////////////////////
 
 		//服务器异步通知页面路径
-		String notify_url = "http://123.57.216.207:8080/batch_trans_notify-JAVA-UTF-8/notify_url.jsp";
+		String notify_url = "https://www.minilizai.com:8443/batch_trans_notify-JAVA-UTF-8/notify_url.jsp";
 		//需http://格式的完整路径，不允许加?id=123这类自定义参数
 		//付款账号
 		String email = new String(request.getParameter("WIDemail").getBytes("ISO-8859-1"),"UTF-8");

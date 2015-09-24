@@ -19,6 +19,7 @@
 <%@ page import="java.util.*"%>
 <%@ page import="com.alipay.util.*"%>
 <%@ page import="com.alipay.config.*"%>
+<%@ page import="com.aiesec.sfdc.*" %>>
 <%
 	//获取支付宝POST过来反馈信息
 	Map<String,String> params = new HashMap<String,String>();
@@ -42,6 +43,13 @@
 
 	//批量付款数据中转账失败的详细信息
 	String fail_details = new String(request.getParameter("fail_details").getBytes("ISO-8859-1"),"UTF-8");
+	
+	//拿到返回的批次号
+	String batch_no = new String(request.getParameter("batch_no").getBytes("ISO-8859-1"),"UTF-8");
+	
+	//拿到所有参数
+	Map<String,String[]> parameters = request.getParameterMap();
+	
 
 	//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
 
@@ -52,6 +60,11 @@
 		//——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
 		
 		//判断是否在商户网站中已经做过了这次通知返回的处理
+		SFDCService sfdcService = new SFDCService();
+		Boolean isHandleBatch = sfdcService.IsHandleBatch(batch_no);
+		if(!isHandleBatch){
+			
+		}
 			//如果没有做过处理，那么执行商户的业务程序
 			//如果有做过处理，那么不执行商户的业务程序
 			
