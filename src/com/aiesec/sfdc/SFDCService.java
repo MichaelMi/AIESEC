@@ -32,7 +32,7 @@ public class SFDCService {
 	public Boolean IsHandleBatch(String batch_no) throws ConnectionException {
 		QueryResult results = connection
 				.query("select Batch_Status__c from Refund_Batch__c where Name = "
-						+ batchNo);
+						+ batch_no);
 		for (SObject sObj : results.getRecords()) {
 			Refund_Batch__c rb = (Refund_Batch__c) sObj;
 			if (rb.getBatch_Status__c() == "已处理") {
