@@ -42,7 +42,7 @@ public class ConfigService {
 			BatchNo = PayDate + "00001";
 			TotalAmount = "2";
 			TotalCount = "2";
-			DetailData = PayDate+"001^18500038131^陈立^1.0^退款1.0元|"+PayDate+"002^minilizai@sina.com^米立业^1.0^退款1.0元";
+			DetailData = PayDate+"001^18500038131^陈立^1.0^退款1.0元|"+PayDate+"002^18511620404^米立业^1.0^退款1.0元";
 
 		} catch (IOException e) {
 			e.printStackTrace();

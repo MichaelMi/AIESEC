@@ -5,6 +5,7 @@ import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import com.alipay.util.UtilDate;
 import com.sforce.soap.enterprise.Connector;
 import com.sforce.soap.enterprise.DeleteResult;
 import com.sforce.soap.enterprise.EnterpriseConnection;
@@ -20,26 +21,50 @@ public class SFDCService {
 
 	EnterpriseConnection connection;
 
-	public SFDCService() throws ConnectionException {
+	public SFDCService() {
 		ConnectorConfig config = new ConnectorConfig();
 		config.setUsername(ConfigService.SFUserName);
 		config.setPassword(ConfigService.SFPassWord);
 		config.setAuthEndpoint(ConfigService.SFEndPoint);
 		config.setTraceMessage(true);
-		connection = Connector.newConnection(config);
+		try {
+			connection = Connector.newConnection(config);
+		} catch (ConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public Boolean IsHandleBatch(String batch_no) throws ConnectionException {
-		QueryResult results = connection
-				.query("select Batch_Status__c from Refund_Batch__c where Name = "
-						+ batch_no);
-		for (SObject sObj : results.getRecords()) {
-			Refund_Batch__c rb = (Refund_Batch__c) sObj;
-			if (rb.getBatch_Status__c() == "已处理") {
-				return true;
+	public Boolean IsHandleBatch(String batch_no){
+		QueryResult results;
+		try {
+			results = connection
+					.query("select Batch_Status__c from Refund_Batch__c where Name = "
+							+ batch_no);
+			for (SObject sObj : results.getRecords()) {
+				Refund_Batch__c rb = (Refund_Batch__c) sObj;
+				if (rb.getBatch_Status__c() == "已处理") {
+					return true;
+				}
 			}
+			
+		} catch (ConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public void LogData(String data) 
+	{
+		Refund_Batch__c rb = new Refund_Batch__c();
+		rb.setDetail_Data__c(data);
+		try {
+			SaveResult[] sr = connection.create(new SObject[]{rb});
+		} catch (ConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {
@@ -70,5 +95,15 @@ public class SFDCService {
 		date2.getYear();
 		date2.getDate();
 		System.out.println(date2.getDate());
+		
+		System.out.println(UtilDate.getDate());
+		System.out.println(UtilDate.getDateFormatter());
+		System.out.println(UtilDate.getOrderNum());
+		System.out.println(UtilDate.getThree());
+		
+		SFDCService sfdcService = null;
+		sfdcService = new SFDCService();
+		sfdcService.LogData("sssssssssssss");
+				
 	}
 }
