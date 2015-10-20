@@ -7,9 +7,7 @@ import java.text.SimpleDateFormat;
 
 import com.alipay.util.UtilDate;
 import com.sforce.soap.enterprise.Connector;
-import com.sforce.soap.enterprise.DeleteResult;
 import com.sforce.soap.enterprise.EnterpriseConnection;
-import com.sforce.soap.enterprise.Error;
 import com.sforce.soap.enterprise.QueryResult;
 import com.sforce.soap.enterprise.SaveResult;
 import com.sforce.soap.enterprise.sobject.Refund_Batch__c;
@@ -33,6 +31,8 @@ public class SFDCService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		System.out.println(connection);
+		System.out.println("login success");
 	}
 
 	public Boolean IsHandleBatch(String batch_no){
