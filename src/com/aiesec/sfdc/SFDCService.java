@@ -34,6 +34,21 @@ public class SFDCService {
 		System.out.println(connection);
 		System.out.println("login success");
 	}
+	
+	public Refund_Batch__c QueryRefundBatchById(String batchId)
+	{
+		QueryResult results;
+		try {
+			results = connection
+					.query("select Batch_No__c,Batch_Status__c,Batch_Num__c,Pay_Date__c,Detail_Data__c,Batch_Fee__c from Refund_Batch__c where id = "
+							+ batchId);
+			return (Refund_Batch__c)results.getRecords()[0];
+		} catch (ConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public Boolean IsHandleBatch(String batch_no){
 		QueryResult results;

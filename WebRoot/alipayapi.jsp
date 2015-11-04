@@ -1,3 +1,4 @@
+<%@page import="com.sforce.soap.enterprise.sobject.Refund_Batch__c"%>
 <%
 /* *
  *功能：批量付款到支付宝账户有密接口接入页
@@ -21,6 +22,9 @@
 <%@ page import="com.alipay.util.*"%>
 <%@ page import="java.util.HashMap"%>
 <%@ page import="java.util.Map"%>
+<%@ page import="com.aiesec.sfdc.ConfigService"%>
+<%@ page import="com.aiesec.sfdc.SFDCService"%>
+<%@ page import="com.sforce.ws.*" %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 	<head>
@@ -34,25 +38,36 @@
 		String notify_url = "https://www.minilizai.com:8443/batch_trans_notify-JAVA-UTF-8/notify_url.jsp";
 		//需http://格式的完整路径，不允许加?id=123这类自定义参数
 		//付款账号
-		String email = new String(request.getParameter("WIDemail").getBytes("ISO-8859-1"),"UTF-8");
+		//String email = new String(request.getParameter("WIDemail").getBytes("ISO-8859-1"),"UTF-8");
+		String email = ConfigService.AliPayEmail;
 		//必填
 		//付款账户名
-		String account_name = new String(request.getParameter("WIDaccount_name").getBytes("ISO-8859-1"),"UTF-8");
+		//String account_name = new String(request.getParameter("WIDaccount_name").getBytes("ISO-8859-1"),"UTF-8");
+		String account_name = ConfigService.AliPayName;
 		//必填，个人支付宝账号是真实姓名公司支付宝账号是公司名称
+		
+// 		SFDCService sfdcService = new SFDCService();
+// 		String batchId = new String(request.getParameter("batchId").getBytes("ISO-8859-1"),"UTF-8");
+// 		Refund_Batch__c rb = sfdcService.QueryRefundBatchById(batchId);
 		//付款当天日期
 		String pay_date = new String(request.getParameter("WIDpay_date").getBytes("ISO-8859-1"),"UTF-8");
+		//String pay_date = rb.getPay_Date__c().toString().replace("-", "");
 		//必填，格式：年[4位]月[2位]日[2位]，如：20100801
 		//批次号
 		String batch_no = new String(request.getParameter("WIDbatch_no").getBytes("ISO-8859-1"),"UTF-8");
+		//String batch_no = rb.getName();
 		//必填，格式：当天日期[8位]+序列号[3至16位]，如：201008010000001
 		//付款总金额
 		String batch_fee = new String(request.getParameter("WIDbatch_fee").getBytes("ISO-8859-1"),"UTF-8");
+		//String batch_fee = rb.getBatch_Fee__c().toString();
 		//必填，即参数detail_data的值中所有金额的总和
 		//付款笔数
 		String batch_num = new String(request.getParameter("WIDbatch_num").getBytes("ISO-8859-1"),"UTF-8");
+		//String batch_num = rb.getBatch_Num__c().toString();
 		//必填，即参数detail_data的值中，“|”字符出现的数量加1，最大支持1000笔（即“|”字符出现的数量999个）
 		//付款详细数据
-		String detail_data = new String(request.getParameter("WIDdetail_data").getBytes("ISO-8859-1"),"UTF-8");
+		//String detail_data = new String(request.getParameter("WIDdetail_data").getBytes("ISO-8859-1"),"UTF-8");
+		String detail_data = request.getParameter("WIDdetail_data");
 		//必填，格式：流水号1^收款方帐号1^真实姓名^付款金额1^备注说明1|流水号2^收款方帐号2^真实姓名^付款金额2^备注说明2....
 		
 		
