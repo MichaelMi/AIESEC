@@ -1,4 +1,3 @@
-<%@page import="com.sforce.soap.enterprise.sobject.Refund_Batch__c"%>
 <%
 /* *
  *功能：批量付款到支付宝账户有密接口接入页
