@@ -12,5 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/jaxen-1.1-beta-6.jar"/>
 	<classpathentry exported="true" kind="lib" path="WebRoot/WEB-INF/lib/wsc-23.jar"/>
 	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/AIESEC.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/jsp-api.jar"/>
+	<classpathentry kind="lib" path="WebRoot/WEB-INF/lib/servlet-api.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

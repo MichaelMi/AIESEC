@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import com.alipay.util.AlipayCore;
 import com.alipay.util.UtilDate;
 import com.sforce.soap.enterprise.Connector;
 import com.sforce.soap.enterprise.EnterpriseConnection;
@@ -18,6 +19,7 @@ import com.sforce.soap.enterprise.sobject.Refund__c;
 import com.sforce.soap.enterprise.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
+import com.sun.tools.classfile.Annotation.element_value;
 
 public class SFDCService {
 
@@ -43,21 +45,29 @@ public class SFDCService {
 	//将支付宝返回的成功数据同步到SFDC
 	public void ProcessSuccessData(String success_details)
 	{
-		Refund__c[] reList =new Refund__c[]{};
-		String[] details = success_details.split("|");
+		String[] details = success_details.split("\\|");
+		List<Refund__c> reList = new ArrayList<Refund__c>();
+		AlipayCore.logResult(details.length+"sss" + details[0]);
 		for (int i = 0; i < details.length; i++) {
-			String[] value = details[i].split("^");
+			String[] value = details[i].split("\\^");
+			AlipayCore.logResult(value+"***********"+value);
 			Refund__c refund = new Refund__c();
 			refund.setRefund_No__c(value[0]);
-			if (value[4] == "S") {
+			if (value[4].equals("S")) {
 				refund.setStatus__c("退款成功");
+			}else {
+				refund.setStatus__c("退款失败");
+				refund.setFailure_Reason__c(value[5]);
 			}
 			refund.setAliPay_No__c(value[6]);
 			refund.setAliPay_Complete_Time__c(value[7]);
-			reList[i] = refund;
+			reList.add(refund);
 		}
 		try {
-			UpsertResult[] uResults = connection.upsert("Refund_No__c", reList);
+			Refund__c[] reArray = reList.toArray(new Refund__c[reList.size()]);
+			UpsertResult[] uResults = connection.upsert("Refund_No__c", reArray);
+			System.out.println(uResults[0].getId());
+			AlipayCore.logResult(uResults[0].toString()+uResults[0].getErrors()[0].getMessage());
 		} catch (ConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,22 +75,22 @@ public class SFDCService {
 	}
 	//将支付宝返回的失败数据同步到SFDC
 	public void ProcessFailData(String fail_details) {
-		Refund__c[] reList =new Refund__c[]{};
-		String[] details = fail_details.split("|");
+		String[] details = fail_details.split("[|]");
+		List<Refund__c> reList = new ArrayList<Refund__c>();
 		for (int i = 0; i < details.length; i++) {
-			String[] value = details[i].split("^");
+			String[] value = details[i].split("\\^");
 			Refund__c refund = new Refund__c();
 			refund.setRefund_No__c(value[0]);
-			if (value[4] == "F") {
+			if (value[4].equals("F")) {
 				refund.setStatus__c("退款失败");
 				refund.setFailure_Reason__c(value[5]);
 			}
 			refund.setAliPay_No__c(value[6]);
 			refund.setAliPay_Complete_Time__c(value[7]);
-			reList[i] = refund;
+			reList.add(refund);
 		}
 		try {
-			UpsertResult[] uResults = connection.upsert("Refund_No__c", reList);
+			UpsertResult[] uResults = connection.upsert("Refund_No__c", (SObject[])reList.toArray(new Refund__c[reList.size()]));
 		} catch (ConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -111,9 +121,9 @@ public class SFDCService {
 	public Boolean IsHandleBatch(String batch_no){
 		QueryResult results;
 		try {
-			results = connection
-					.query("select Batch_Status__c from Refund_Batch__c where Name = "
-							+ batch_no);
+			String query = "select Batch_Status__c from Refund_Batch__c where Name = \'"+ batch_no+"\'";
+			System.out.println(query+"*****************");
+			results = connection.query(query);
 			for (SObject sObj : results.getRecords()) {
 				Refund_Batch__c rb = (Refund_Batch__c) sObj;
 				if (rb.getBatch_Status__c() == "已处理") {
@@ -177,5 +187,13 @@ public class SFDCService {
 		SFDCService sfdcService = null;
 		sfdcService = new SFDCService();
 		sfdcService.LogData("sssssssssssss");
+		
+		String succ = "0315006^xinjie_xj@163.com^星辰公司1^20.00^F^TXN_RESULT_TRANSFER_OUT_CAN_NOT_EQUAL_IN^200810248427065^20081024143651";
+		String[] strings = succ.split("\\^");
+		System.out.println(strings.length);
+		
+		List<Refund__c> reList = new ArrayList<Refund__c>();
+		reList.add(new Refund__c());
+		System.out.println(reList.size());
 	}
 }

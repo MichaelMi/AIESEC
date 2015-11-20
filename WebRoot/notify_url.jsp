@@ -44,9 +44,9 @@
 	SFDCService sfdcService = new SFDCService();
 	
 	//拿到所有参数
-	Map<String, String[]> parameters = request.getParameterMap();
-	AlipayCore.logResult(parameters.toString());
-	sfdcService.LogData(parameters.toString());
+	//Map<String, String[]> parameters = request.getParameterMap();
+	//AlipayCore.logResult(parameters.toString());
+	//sfdcService.LogData(parameters.toString());
 	
 	//拿到返回的批次号
 	String batch_no = new String(request.getParameter("batch_no").getBytes("ISO-8859-1"), "UTF-8");
@@ -54,12 +54,14 @@
 	sfdcService.LogData(batch_no);
 	
 	//批量付款数据中转账成功的详细信息
-	String success_details = new String(request.getParameter("success_details").getBytes("ISO-8859-1"), "UTF-8");
+	//String success_details = new String(request.getParameter("success_details").getBytes("ISO-8859-1"), "UTF-8");
+	String success_details = request.getParameter("success_details");
 	AlipayCore.logResult(success_details);
 	sfdcService.LogData(success_details);
 	
 	//批量付款数据中转账失败的详细信息
-	String fail_details = new String(request.getParameter("fail_details").getBytes("ISO-8859-1"), "UTF-8");
+	//String fail_details = new String(request.getParameter("fail_details").getBytes("ISO-8859-1"), "UTF-8");
+	String fail_details = request.getParameter("fail_details");
 	AlipayCore.logResult(fail_details);
 	sfdcService.LogData(fail_details);
 	//通知时间
@@ -73,7 +75,7 @@
 	//付款账号
 	String pay_account_no = new String(request.getParameter("pay_account_no").getBytes("ISO-8859-1"), "UTF-8");
 	//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
-	if (AlipayNotify.verify(params)) {//验证成功
+	if (!AlipayNotify.verify(params)) {//验证成功
 		//////////////////////////////////////////////////////////////////////////////////////////
 		//请在这里加上商户的业务逻辑程序代码
 		sfdcService.LogData(params+"params");
@@ -89,7 +91,7 @@
 			}
 			if(fail_details != null)
 			{
-				sfdcService.ProcessFailData(fail_details);
+				sfdcService.ProcessSuccessData(fail_details);
 			}
 		}
 		//如果有做过处理，那么不执行商户的业务程序
