@@ -6,7 +6,6 @@
 	 说明：
 	 以下代码只是为了方便商户测试而提供的样例代码，商户可以根据自己网站的需要，按照技术文档编写,并非一定要使用该代码。
 	 该代码仅供学习和研究支付宝接口使用，只是提供一个参考。
-
 	 //***********页面功能说明***********
 	 创建该页面文件时，请留心该页面文件中无任何HTML代码及空格。
 	 该页面不能在本机电脑测试，请到服务器上做测试。请确保外部可以访问该页面。
@@ -42,28 +41,18 @@
 	}
 	//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以下仅供参考)//
 	SFDCService sfdcService = new SFDCService();
-	
 	//拿到所有参数
 	//Map<String, String[]> parameters = request.getParameterMap();
 	//AlipayCore.logResult(parameters.toString());
 	//sfdcService.LogData(parameters.toString());
-	
 	//拿到返回的批次号
 	String batch_no = new String(request.getParameter("batch_no").getBytes("ISO-8859-1"), "UTF-8");
-	AlipayCore.logResult(batch_no);
-	sfdcService.LogData(batch_no);
-	
 	//批量付款数据中转账成功的详细信息
 	//String success_details = new String(request.getParameter("success_details").getBytes("ISO-8859-1"), "UTF-8");
 	String success_details = request.getParameter("success_details");
-	AlipayCore.logResult(success_details);
-	sfdcService.LogData(success_details);
-	
 	//批量付款数据中转账失败的详细信息
 	//String fail_details = new String(request.getParameter("fail_details").getBytes("ISO-8859-1"), "UTF-8");
 	String fail_details = request.getParameter("fail_details");
-	AlipayCore.logResult(fail_details);
-	sfdcService.LogData(fail_details);
 	//通知时间
 	String notify_time = new String(request.getParameter("notify_time").getBytes("ISO-8859-1"), "UTF-8");
 	//通知校验ID
@@ -71,35 +60,27 @@
 	//付款账号ID
 	String pay_user_id = new String(request.getParameter("pay_user_id").getBytes("ISO-8859-1"), "UTF-8");
 	//付款账号姓名
-	String pay_user_name = new String(request.getParameter("pay_user_name").getBytes("ISO-8859-1"), "UTF-8");
+	//String pay_user_name = new String(request.getParameter("pay_user_name").getBytes("ISO-8859-1"), "UTF-8");
+	String pay_user_name = request.getParameter("pay_user_name");
 	//付款账号
 	String pay_account_no = new String(request.getParameter("pay_account_no").getBytes("ISO-8859-1"), "UTF-8");
 	//获取支付宝的通知返回参数，可参考技术文档中页面跳转同步通知参数列表(以上仅供参考)//
 	if (!AlipayNotify.verify(params)) {//验证成功
 		//////////////////////////////////////////////////////////////////////////////////////////
 		//请在这里加上商户的业务逻辑程序代码
-		sfdcService.LogData(params+"params");
 		//——请根据您的业务逻辑来编写程序（以下代码仅作参考）——
 		//判断是否在商户网站中已经做过了这次通知返回的处理
 		Boolean isHandleBatch = sfdcService.IsHandleBatch(batch_no);
 		//如果没有做过处理，那么执行商户的业务程序
 		if (!isHandleBatch) {
-			sfdcService.UpdateRefundBatch(batch_no, success_details, fail_details, notify_time, notify_id, pay_user_id, pay_user_name, pay_account_no);
-			if(success_details != null)
-			{
-				sfdcService.ProcessSuccessData(success_details);
-			}
-			if(fail_details != null)
-			{
-				sfdcService.ProcessSuccessData(fail_details);
-			}
+			sfdcService.UpdateRefundBatch(batch_no, success_details, fail_details, notify_time, notify_id, pay_user_id, pay_user_name, pay_account_no, params+"");
+			sfdcService.ProcessAliPayDetailDataToSalesforce(success_details, fail_details);
 		}
 		//如果有做过处理，那么不执行商户的业务程序
 		out.println("success"); //请不要修改或删除
 		//——请根据您的业务逻辑来编写程序（以上代码仅作参考）——
 		//////////////////////////////////////////////////////////////////////////////////////////
 	} else {//验证失败
-		sfdcService.LogData("fail");
 		out.println("fail");
 	}
 %>
