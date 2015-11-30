@@ -19,7 +19,6 @@ import com.sforce.soap.enterprise.sobject.Refund__c;
 import com.sforce.soap.enterprise.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
-import com.sun.tools.classfile.Annotation.element_value;
 
 public class SFDCService {
 	EnterpriseConnection connection;
@@ -47,7 +46,9 @@ public class SFDCService {
 		if (fail_details != null) {
 			aliPayDetails += fail_details;
 		}
+		AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce aliPayDetails:"+aliPayDetails);
 		String[] details = aliPayDetails.split("\\|");
+		AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce details:"+details);
 		List<Refund__c> reList = new ArrayList<Refund__c>();
 		for (int i = 0; i < details.length; i++) {
 			String[] record = details[i].split("\\^");
@@ -62,12 +63,17 @@ public class SFDCService {
 			refund.setAliPay_No__c(record[6]);
 			refund.setAliPay_Complete_Time__c(record[7]);
 			reList.add(refund);
-			try {
-				Refund__c[] reArray = reList.toArray(new Refund__c[reList.size()]);
-				UpsertResult[] uResults = connection.upsert("Refund_No__c", reArray);
-			} catch (ConnectionException e) {
-				e.printStackTrace();
-			}
+		}
+		try {
+			Refund__c[] reArray = reList.toArray(new Refund__c[reList.size()]);
+			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce reArray:"+reArray);
+			UpsertResult[] uResults = connection.upsert("Refund_No__c", reArray);
+			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce uResults:"+uResults);
+		} catch (ConnectionException e) {
+			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce ConnectionException:"+e.getMessage());
+			e.printStackTrace();
+		}catch (Exception e) {
+			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 	}
 	// 更新批量退款状态为已处理
@@ -86,8 +92,11 @@ public class SFDCService {
 		rb.setLog_Result__c(params);
 		try {
 			UpsertResult[] uResult = connection.upsert("Batch_No__c", new Refund_Batch__c[] { rb });
+			AlipayCore.logResult("IsHandleBatch uResult:"+uResult);
 		} catch (ConnectionException e) {
-			e.printStackTrace();
+			AlipayCore.logResult("UpdateRefundBatch ConnectionException:"+e.getMessage());
+		}catch (Exception e) {
+			AlipayCore.logResult("UpdateRefundBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 	}
 	// 根据批次号查询当前批量退款是否处理过,处理过返回True，没处理过返回False
@@ -96,14 +105,19 @@ public class SFDCService {
 		try {
 			String query = "select Batch_Status__c from Refund_Batch__c where Name = \'" + batch_no + "\'";
 			results = connection.query(query);
+			AlipayCore.logResult("IsHandleBatch results:"+results.getRecords());
 			for (SObject sObj : results.getRecords()) {
 				Refund_Batch__c rb = (Refund_Batch__c) sObj;
+				AlipayCore.logResult("IsHandleBatch rb:"+rb);
 				if (rb.getBatch_Status__c().equals("已处理")) {
 					return true;
 				}
 			}
 		} catch (ConnectionException e) {
+			AlipayCore.logResult("IsHandleBatch ConnectionException:"+e.getMessage());
 			e.printStackTrace();
+		}catch (Exception e) {
+			AlipayCore.logResult("IsHandleBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 		return false;
 	}
