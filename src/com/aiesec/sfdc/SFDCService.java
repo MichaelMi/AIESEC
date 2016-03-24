@@ -27,6 +27,7 @@ public class SFDCService {
 		ConnectorConfig config = new ConnectorConfig();
 		config.setUsername(ConfigService.SFUserName);
 		config.setPassword(ConfigService.SFPassWord);
+		config.setServiceEndpoint(ConfigService.SFEndPoint);
 		config.setAuthEndpoint(ConfigService.SFEndPoint);
 		config.setTraceMessage(true);
 		try {
@@ -46,9 +47,13 @@ public class SFDCService {
 		if (fail_details != null) {
 			aliPayDetails += fail_details;
 		}
-		AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce aliPayDetails:"+aliPayDetails);
+		int last = aliPayDetails.lastIndexOf("|");
+		if (last == aliPayDetails.length()-1) {
+			aliPayDetails = aliPayDetails.substring(0,last);
+		}
+		//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce aliPayDetails:"+aliPayDetails);
 		String[] details = aliPayDetails.split("\\|");
-		AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce details:"+details);
+		//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce details:"+details);
 		List<Refund__c> reList = new ArrayList<Refund__c>();
 		for (int i = 0; i < details.length; i++) {
 			String[] record = details[i].split("\\^");
@@ -66,14 +71,14 @@ public class SFDCService {
 		}
 		try {
 			Refund__c[] reArray = reList.toArray(new Refund__c[reList.size()]);
-			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce reArray:"+reArray);
+			//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce reArray:"+reArray);
 			UpsertResult[] uResults = connection.upsert("Refund_No__c", reArray);
-			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce uResults:"+uResults);
+			//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce uResults:"+uResults);
 		} catch (ConnectionException e) {
-			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce ConnectionException:"+e.getMessage());
+			//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce ConnectionException:"+e.getMessage());
 			e.printStackTrace();
 		}catch (Exception e) {
-			AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
+			//AlipayCore.logResult("ProcessAliPayDetailDataToSalesforce Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 	}
 	// 更新批量退款状态为已处理
@@ -92,20 +97,20 @@ public class SFDCService {
 		rb.setLog_Result__c(params);
 		try {
 			UpsertResult[] uResult = connection.upsert("Batch_No__c", new Refund_Batch__c[] { rb });
-			AlipayCore.logResult("IsHandleBatch uResult:"+uResult);
+			//AlipayCore.logResult("IsHandleBatch uResult:"+uResult);
 		} catch (ConnectionException e) {
-			AlipayCore.logResult("UpdateRefundBatch ConnectionException:"+e.getMessage());
+			//AlipayCore.logResult("UpdateRefundBatch ConnectionException:"+e.getMessage());
 		}catch (Exception e) {
-			AlipayCore.logResult("UpdateRefundBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
+			//AlipayCore.logResult("UpdateRefundBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 	}
 	// 根据批次号查询当前批量退款是否处理过,处理过返回True，没处理过返回False
 	public Boolean IsHandleBatch(String batch_no) {
 		QueryResult results;
 		try {
-			String query = "select Batch_Status__c from Refund_Batch__c where Name = \'" + batch_no + "\'";
+			String query = "select Batch_Status__c from Refund_Batch__c where Batch_No__c = \'" + batch_no + "\'";
 			results = connection.query(query);
-			AlipayCore.logResult("IsHandleBatch results:"+results.getRecords());
+			//AlipayCore.logResult("IsHandleBatch results:"+results.getRecords());
 			for (SObject sObj : results.getRecords()) {
 				Refund_Batch__c rb = (Refund_Batch__c) sObj;
 				AlipayCore.logResult("IsHandleBatch rb:"+rb);
@@ -114,10 +119,10 @@ public class SFDCService {
 				}
 			}
 		} catch (ConnectionException e) {
-			AlipayCore.logResult("IsHandleBatch ConnectionException:"+e.getMessage());
+			//AlipayCore.logResult("IsHandleBatch ConnectionException:"+e.getMessage());
 			e.printStackTrace();
 		}catch (Exception e) {
-			AlipayCore.logResult("IsHandleBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
+			//AlipayCore.logResult("IsHandleBatch Exception:"+e.getMessage()+e.getLocalizedMessage()+e.toString());
 		}
 		return false;
 	}

@@ -6,6 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import org.apache.commons.httpclient.cookie.RFC2109Spec;
+
+import com.sforce.soap.enterprise.sobject.Refund_Batch__c;
+
 public class ConfigService {
 
 	public static String SFUserName;
@@ -20,6 +24,7 @@ public class ConfigService {
 	public static String TotalAmount;
 	public static String TotalCount;
 	public static String DetailData;
+	public static String NotifyUrl;
 
 	static {
 		Properties p = new Properties();
@@ -35,6 +40,7 @@ public class ConfigService {
 			AliPayName = p.getProperty("AliPayName");
 			AliPayPartner = p.getProperty("AliPayPartner");
 			AliPayKey = p.getProperty("AliPayKey");
+			NotifyUrl = p.getProperty("NotifyUrl");
 
 			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 			String currentDateString = format.format(new Date());
@@ -43,7 +49,6 @@ public class ConfigService {
 			TotalAmount = "2";
 			TotalCount = "2";
 			DetailData = PayDate+"001^18500038131^陈立^1.0^退款1.0元|"+PayDate+"002^18511620404^米立业^1.0^退款1.0元";
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
